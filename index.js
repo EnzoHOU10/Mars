@@ -37,7 +37,7 @@ app.get('/mars-weather', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Serveur backend démarré sur http://localhost:${PORT}`);
+  console.log(`Serveur backend démarré sur http://localhost:${PORT}/mars-weather`);
 });
 
 //node index.js pour lancer le serveur dans le terminal
