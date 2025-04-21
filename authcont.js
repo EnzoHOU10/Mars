@@ -7,16 +7,16 @@ dotenv.config();
 
 exports.register = async (req, res) => {
   const { prenom_utilisateur, nom_utilisateur, email_utilisateur, mdp_utilisateur } = req.body;
-
+  console.log("ce que j'aiiiiiiii :", req.body);
   try {
-    const [existingUser] = await db.execute('SELECT * FROM utilisateurs WHERE email_utilisateur = ?', [email_utilisateur]);
+    const [existingUser] = await db.execute('SELECT * FROM utilisateur WHERE email_utilisateur = ?', [email_utilisateur]);
     if (existingUser.length > 0) {
       return res.status(400).json({ message: 'Email déjà utilisé' });
     }
 
     const hashedPassword = await bcrypt.hash(mdp_utilisateur, 10);
     const [result] = await db.execute(
-      'INSERT INTO utilisateurs (prenom_utilisateur, nom_utilisateur, email_utilisateur, mdp_utilisateur) VALUES (?, ?, ?, ?)',
+      'INSERT INTO utilisateur (prenom_utilisateur, nom_utilisateur, email_utilisateur, mdp_utilisateur) VALUES (?, ?, ?, ?)',
       [prenom_utilisateur, nom_utilisateur, email_utilisateur, hashedPassword]
     );
 
@@ -28,9 +28,10 @@ exports.register = async (req, res) => {
     };
 
     const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '1h' });
-
+    console.log("Compte créé avec succès :", user);
     res.status(201).json({ token, user });
   } catch (err) {
+    console.error("Erreur lors de l'inscription :", err);
     res.status(500).json({ message: 'Erreur serveur', error: err });
   }
 };
@@ -39,7 +40,7 @@ exports.login = async (req, res) => {
   const { email_utilisateur, mdp_utilisateur } = req.body;
 
   try {
-    const [users] = await db.execute('SELECT * FROM utilisateurs WHERE email_utilisateur = ?', [email_utilisateur]);
+    const [users] = await db.execute('SELECT * FROM utilisateur WHERE email_utilisateur = ?', [email_utilisateur]);
     if (users.length === 0) {
       return res.status(400).json({ message: 'Email ou mot de passe incorrect' });
     }
@@ -58,7 +59,8 @@ exports.login = async (req, res) => {
     };
 
     const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: '1h' });
-
+    console.log("Compte connecté avec succès");
+    req.session.user = user;
     res.status(200).json({ token, user: tokenPayload });
   } catch (err) {
     res.status(500).json({ message: 'Erreur serveur', error: err });
