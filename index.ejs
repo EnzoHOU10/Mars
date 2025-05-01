@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <title>Weather</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Découvrez la météo quotidienne sur Mars : températures, vents, pression atmosphérique et données en temps réel issues de la mission InSight de la NASA." />
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" type="text/css" href="/css/style.min.css" />
+    <link rel="icon" href="/img/logo.ico" type="image/ico" sizes="16x16" />
+  </head>
+  <body>
+    <header>
+      <%- include('components/navbar', { isAuthenticated: isAuthenticated }) %>
+    </header>
+    <div class="rotating-background">
+      <link rel="preload" href="/img/background.webp" as="image" type="image/webp">
+    </div>
+    <div class="info-page">
+      <div class="info-summary">
+        <% weathers.forEach(function(weather, index) { %>
+          <div class="summary-card" onclick="showDetails('<%= index %>')">
+            <h2>Jour <%= weather.sol %></h2>
+            <p>Température moyenne: <%= weather.temperature.av %>°C</p>
+            <p>Température min: <%= weather.temperature.mn %>°C</p>
+            <p>Température max: <%= weather.temperature.mx %>°C</p>
+            <% if (weather.temperature.av > -20 && weather.windSpeed?.av < 10) { %>
+              <!-- Temps relativement chaud avec peu de vent -->
+              <img src="/img/weather/sun.webp" loading="lazy" width="50" height="50" alt="Sunny Weather" />
+            <% } else if (weather.temperature.av > -20 && weather.windSpeed?.av >= 10 && weather.windSpeed?.av < 20) { %>
+              <!-- Temps relativement chaud avec vent modéré -->
+              <img src="/img/weather/sun2.webp" loading="lazy" width="50" height="50" alt="Sunny with Moderate Wind" />
+            <% } else if (weather.temperature.av > -20 && weather.windSpeed?.av >= 20) { %>
+              <!-- Temps relativement chaud avec tempête -->
+              <img src="/img/weather/sun2rain.webp" loading="lazy" width="50" height="50" alt="Sunny with Storm" />
+            <% } else if (weather.temperature.av <= -20 && weather.temperature.av > -60 && weather.windSpeed?.av < 10) { %>
+              <!-- Temps froid avec peu de vent -->
+              <img src="/img/weather/cloud.webp" loading="lazy" width="50" height="50" alt="Cold Weather" />
+            <% } else if (weather.temperature.av <= -20 && weather.windSpeed?.av >= 10) { %>
+              <!-- Temps froid et venteux -->
+              <img src="/img/weather/tornade.webp" loading="lazy" width="50" height="50" alt="Cold and Windy Weather" />
+            <% } else if (weather.temperature.av <= -60) { %>
+              <!-- Temps extrêmement froid -->
+              <img src="/img/weather/snow.webp" loading="lazy" width="50" height="50" alt="Extremely Cold Weather" />
+            <% } else if (weather.pressure?.av < 500) { %>
+              <!-- Basse pression atmosphérique, possible tempête de poussière -->
+              <img src="/img/weather/thunder.webp" loading="lazy" width="50" height="50" alt="Low Pressure Weather" />
+            <% } else if (weather.pressure?.av >= 500 && weather.pressure?.av < 700) { %>
+              <!-- Pression modérée -->
+              <img src="/img/weather/rain.webp" loading="lazy" width="50" height="50" alt="Moderate Pressure Weather" />
+            <% } else if (weather.pressure?.av >= 700) { %>
+              <!-- Haute pression atmosphérique -->
+              <img src="/img/weather/rain2.webp" loading="lazy" width="50" height="50" alt="High Pressure Weather" />
+            <% } else if (weather.season === "winter") { %>
+              <!-- Saison hivernale -->
+              <img src="/img/weather/snow.webp" loading="lazy" width="50" height="50" alt="Winter Weather" />
+            <% } else if (weather.season === "summer") { %>
+              <!-- Saison estivale -->
+              <img src="/img/weather/sun.webp" loading="lazy" width="50" height="50" alt="Summer Weather" />
+            <% } else if (weather.season === "autumn") { %>
+              <!-- Saison automnale -->
+              <img src="/img/weather/rain3.webp" loading="lazy" width="50" height="50" alt="Autumn Weather" />
+            <% } else if (weather.season === "spring") { %>
+              <!-- Saison printanière -->
+              <img src="/img/weather/sun2rain.webp" loading="lazy" width="50" height="50" alt="Spring Weather" />
+            <% } else { %>
+              <!-- Conditions inconnues -->
+              <img src="/img/weather/brouillard.webp" loading="lazy" width="50" height="50" alt="Unknown Weather" />
+            <% } %>
+          </div>
+        <% }); %>
+      </div>
+      <div class="slider-container">
+        <% weathers.forEach(function(weather, index) { %>
+          <div class="slider-card" id="card-<%= index %>" style="display: none; width: 80%;">
+            <h2>Jour <%= weather.sol %> - Détails</h2>
+      
+            <div class="columns-wrapper">
+              <div class="column">
+                <p><strong>🌡️Température</strong></p>
+                <p>Min: <%= weather.temperature.mn %> °C</p>
+                <p>Max: <%= weather.temperature.mx %> °C</p>
+                <p>Moyenne: <%= weather.temperature.av %> °C</p>
+              </div>
+              <div class="column">
+                <p><strong>💨Vent</strong></p>
+                <p>Min: <%= weather.pressure?.mn ?? "N/A" %> m/s</p>
+                <p>Max: <%= weather.pressure?.mx ?? "N/A" %> m/s</p>
+                <p>Moyenne: <%= weather.pressure?.av ?? "N/A" %> m/s</p>
+              </div>
+              <div class="column">
+                <p><strong>💥Pression</strong></p>
+                <p>Min: <%= weather.windSpeed?.mn ?? "N/A" %> Pa</p>
+                <p>Max: <%= weather.windSpeed?.mx ?? "N/A" %> Pa</p>
+                <p>Moyenne: <%= weather.windSpeed?.av ?? "N/A" %> Pa</p>
+              </div>
+            </div>
+          </div>
+          <div class="slider-card" id="card-<%= index %>-bis" style="display: none; width: 20%;">
+              <div>
+                <p><strong>Saison</strong></p>
+                <p><%= weather.season %></p>
+              </div>
+              <div>
+                <p><strong>firstUTC</strong></p>
+                <p><%= weather.firstUTC %></p>
+              </div>
+              <div>
+                <p><strong>lastUTC</strong></p>
+                <p><%= weather.lastUTC %></p>
+              </div>
+          </div>
+        <% }); %>
+      </div>
+    </div>
+  </body>
+  <script src="/js/script.min.js"></script>
+</html>
