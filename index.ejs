@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <title>Weather</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Découvrez la météo quotidienne sur Mars : températures, vents, pression atmosphérique et données en temps réel issues de la mission InSight de la NASA." />
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" type="text/css" href="/css/style.css" />
+    <link rel="icon" href="/img/logo.ico" type="image/ico" sizes="16x16" />
+  </head>
+  <body>
+    <header>
+      <%- include('components/navbar', { isAuthenticated: isAuthenticated }) %>
+    </header>
+    <div class="rotating-background">
+      <link rel="preload" href="/img/background.webp" as="image" type="image/webp">
+    </div>
+    <div class="info-page">
+    
+      <!-- Section des mini cartes en haut -->
+      <div class="info-summary">
+        <% weathers.forEach(function(weather, index) { %>
+          <div class="summary-card" onclick="showDetails('<%= index %>')">
+            <h2>Jour <%= weather.sol %></h2>
+            <p>Température moyenne: <%= weather.temperature.av %>°C</p>
+            <p>Température min: <%= weather.temperature.mn %>°C</p>
+            <p>Température max: <%= weather.temperature.mx %>°C</p>
+            <% if (weather.temperature.av > 0) { %>
+              <img src="/img/weather/sun.webp" loading="lazy" width="50" height="50" alt="Weather" />
+            <% } else { %>
+              <img src="/img/weather/snow.webp" loading="lazy" width="50" height="50" alt="Weather" />
+            <% } %>
+          </div>
+        <% }); %>
+      </div>
+    
+      <!-- Section de la carte horizontale avec les détails -->
+      <div class="slider-container">
+        <% weathers.forEach(function(weather, index) { %>
+          <div class="slider-card" id="card-<%= index %>" style="display: none; width: 80%;">
+            <h2>Jour <%= weather.sol %> - Détails</h2>
+      
+            <div class="columns-wrapper">
+              <div class="column">
+                <p><strong>🌡️Température</strong></p>
+                <p>Min: <%= weather.temperature.mn %> °C</p>
+                <p>Max: <%= weather.temperature.mx %> °C</p>
+                <p>Moyenne: <%= weather.temperature.av %> °C</p>
+              </div>
+              <div class="column">
+                <p><strong>💨Vent</strong></p>
+                <p>Min: <%= weather.pressure?.mn ?? "N/A" %> m/s</p>
+                <p>Max: <%= weather.pressure?.mx ?? "N/A" %> m/s</p>
+                <p>Moyenne: <%= weather.pressure?.av ?? "N/A" %> m/s</p>
+              </div>
+              <div class="column">
+                <p><strong>💥Pression</strong></p>
+                <p>Min: <%= weather.windSpeed?.mn ?? "N/A" %> Pa</p>
+                <p>Max: <%= weather.windSpeed?.mx ?? "N/A" %> Pa</p>
+                <p>Moyenne: <%= weather.windSpeed?.av ?? "N/A" %> Pa</p>
+              </div>
+            </div>
+          </div>
+          <div class="slider-card" id="card-<%= index %>-bis" style="display: none; width: 20%;">
+              <div>
+                <p><strong>Saison</strong></p>
+                <p><%= weather.season %></p>
+              </div>
+              <div>
+                <p><strong>firstUTC</strong></p>
+                <p><%= weather.firstUTC %></p>
+              </div>
+              <div>
+                <p><strong>lastUTC</strong></p>
+                <p><%= weather.lastUTC %></p>
+              </div>
+          </div>
+        <% }); %>
+      </div>
+      
+    </div>
+    
+  </body>
+  <script src="/js/script.js"></script>
+</html>

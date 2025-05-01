@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <title>Green IT Analytics</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Analyse du bilan GreenIT de notre site web. Découvrez l'impact environnemental de nos choix techniques et comment nous optimisons notre empreinte carbone.">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/css/style.css" />
+    <link rel="icon" href="/img/logo.ico" type="image/ico" sizes="16x16" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <header>
+      <%- include('components/navbar', { isAuthenticated: isAuthenticated }) %>
+    </header>
+    <div class="analytics-container">
+      <div class="info-page">
+        <h1>Green IT Analytics</h1>
+        <div class="card">
+          <h2>Statistiques générales</h2>
+          <p>Total des requêtes : <%= analytics.totalRequests %></p>
+          <p>Données transférées : <%= analytics.totalDataTransferred %> Mo</p>
+          <p>Temps de chargement moyen : <%= analytics.averageLoadTime %> secondes</p>
+          <p>Émissions de CO₂ estimées : <%= analytics.carbonEmission %> g</p>
+        </div>
+
+        <div class="card">
+          <h2>Optimisations</h2>
+          <p>Images optimisées : <%= analytics.optimizations.imagesOptimized %>%</p>
+          <p>CSS minifié : <%= analytics.optimizations.cssMinified ? 'Oui' : 'Non' %></p>
+          <p>JS minifié : <%= analytics.optimizations.jsMinified ? 'Oui' : 'Non' %></p>
+        </div>
+      </div> 
+      <div class="graph">
+        <h2>Graphique des émissions de CO₂</h2>
+        <canvas id="carbonChart"></canvas>
+      </div>
+    </div>
+  </body>
+  <script src="/js/script.js"></script>
+  <script>
+    const ctx = document.getElementById('carbonChart').getContext('2d');
+    const carbonChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Requêtes', 'Données transférées', 'Temps de chargement'],
+        datasets: [{
+          label: 'Émissions de CO₂ (g)',
+          data: [<%= analytics.totalRequests %>, <%= analytics.totalDataTransferred %>, <%= analytics.averageLoadTime %>],
+          backgroundColor: ['#4CAF50', '#FFC107', '#2196F3'],
+        }]
+      },
+      options: {
+        responsive: true,
+      }
+    });
+  </script>
+</html>
