@@ -1,1 +1,0 @@
-const jwt=require("jsonwebtoken"),dotenv=require("dotenv");dotenv.config(),module.exports=(e,s,t)=>{const o=e.headers.authorization;if(!o)return s.status(401).json({message:"Accès refusé"});try{const s=jwt.verify(o,process.env.JWT_SECRET);e.user=s,t()}catch(e){s.status(400).json({message:"Token invalide"})}};
